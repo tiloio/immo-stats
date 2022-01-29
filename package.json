@@ -1,0 +1,20 @@
+{
+  "name": "immo-stats",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild index.ts --bundle --outfile=index.js --platform=node --format=cjs --target=node16",
+    "start": "npm run build && node index.js"
+  },
+  "keywords": [],
+  "author": "Tilo",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "13.1.2"
+  },
+  "devDependencies": {
+    "esbuild": "0.14.14",
+    "@types/puppeteer": "5.4.4"
+  }
+}
