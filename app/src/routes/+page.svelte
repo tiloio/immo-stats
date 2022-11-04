@@ -1,2 +1,13 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+    import Ad from 'ad.svelte';
+
+  /** @type {import('./$types').PageData} */
+  export let data;
+</script>
+
+
+<h1>All Ads</h1>
+
+{#each data.ads as ad}
+  <Ad {ad} />
+{/each}

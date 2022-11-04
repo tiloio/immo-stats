@@ -1,4 +1,9 @@
 export type Immo = {
+    scrape: {
+        source: string;
+        date: number;
+        url: string;
+    }
     title: string;
     price: string;
     date: string;
@@ -11,5 +16,6 @@ export type Immo = {
 
 export type ImmoImage = {
     url: string;
+    date: number;
     hash: string;
 }

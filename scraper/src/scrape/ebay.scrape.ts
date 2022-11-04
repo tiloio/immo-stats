@@ -2,6 +2,7 @@ import { test, expect, Page, Locator, ElementHandle } from '@playwright/test';
 import type { ElementHandleForTag } from 'playwright-core/types/structs';
 import { imageHash } from 'image-hash';
 import { Immo } from '../../immo';
+import { transferImmos } from '../adapters/immo-api';
 
 type Article = {
   text: string,
@@ -10,17 +11,18 @@ type Article = {
 }
 
 test('homepage has Playwright in title and get started link linking to the intro page', async ({ page }) => {
-  await page.goto('https://www.ebay-kleinanzeigen.de/s-suchanfrage.html?keywords=haus&categoryId=&locationStr=Wolfsburg+-+Niedersachsen&locationId=3071&radius=20&sortingField=SORTING_DATE&adType=&posterType=&pageNum=1&action=find&maxPrice=&minPrice=1000');
+  await page.goto('https://www.ebay-kleinanzeigen.de/s-suchanfrage.html?keywords=haus&categoryId=&locationStr=Wolfsburg+-+Niedersachsen&locationId=3071&radius=20&sortingField=SORTING_DATE&adType=&posterType=&pageNum=1&action=find&maxPrice=&minPrice=800');
   await clearPageFromBanners(page);
 
   const articles = await scrapeArticles(page);
-  const data = await Promise.all(articles.map(article => readArticle(page, article)));
+  console.log(`Read ${articles.length} articles`);
 
-  console.log(articles.length, data.length);
+  const immos = await Promise.all(articles.map(article => extractImmo(page, article)));
+  await transferImmos(immos);
 });
 
 
-const readArticle = async (page: Page, article: Article): Promise<Immo> => {
+const extractImmo = async (page: Page, article: Article): Promise<Immo> => {
   await article.element.click();
 
   console.log(`Fetch article (${page.url()})`);
@@ -39,6 +41,11 @@ const readArticle = async (page: Page, article: Article): Promise<Immo> => {
   const text = await fetchArrayText(page.locator("#viewad-description"));
 
   return {
+    scrape: {
+      date: Date.now(),
+      source: "ebay",
+      url: page.url(),
+    },
     title,
     price,
     date,
@@ -73,7 +80,7 @@ const extractImages = (imageElements: ElementHandle[]) =>
 
     const hash = await hashImage(url)
 
-    return { url, hash }
+    return { url, hash, date: Date.now() }
   }));
 
 const hashImage = (url: string) => new Promise((resolve, reject) => imageHash(url, 128, true, (error, data) => {
