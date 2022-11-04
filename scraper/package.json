@@ -1,0 +1,27 @@
+{
+  "name": "immo-stats",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "playwright test",
+    "dev": "playwright test --headed"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tiloio/immo-stats.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tiloio/immo-stats/issues"
+  },
+  "homepage": "https://github.com/tiloio/immo-stats#readme",
+  "devDependencies": {
+    "@playwright/test": "1.26.0"
+  },
+  "dependencies": {
+    "image-hash": "5.3.1"
+  }
+}
