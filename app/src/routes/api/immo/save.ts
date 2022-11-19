@@ -1,42 +1,49 @@
+import type { Immo } from "../../../../../immo";
 import { ImmoRepository } from "../../../lib/server/immo.repository";
 
 const immoRepo = await ImmoRepository.create();
 
 export const saveImmo = async (immos: unknown[]) => {
-        const validatedImmos = immos.map(validate);
-        await immoRepo.save(valdatedImmos);
+    const validatedImmos = immos.map(validate);
+    await immoRepo.saveAll(validatedImmos);
 }
 
-const validate = (immo: unknown): Immo => {
-    return {
-        scrape: {
-            source: validateText('scrape.source', immo.scrape.source),
-            date: validateNumber('scrape.date', immo.scrape.date),
-            url: validateText('scrape.url', immo.scrape.url),
-        },
-        title: validateText('title', immo.title),
-        price: validateText('price', immo.price),
-        date: validateText('date', immo.date),
-        address: validateText('address', immo.address),
-        livingQm: validateText('livingQm', immo.livingQm),
-        propertyQm: validateText('propertyQm', immo.propertyQm),
-        text: validateArray('text', immo.text, validateText),
-        images: validateArray('images', immo.images, validateImage),
+const validate = (immo: any): Immo => {
+    try {
+        return {
+            scrape: {
+                source: validateText('scrape.source', immo.scrape.source),
+                date: validateNumber('scrape.date', immo.scrape.date),
+                url: validateText('scrape.url', immo.scrape.url),
+            },
+            title: validateText('title', immo.title),
+            price: validateText('price', immo.price),
+            date: validateText('date', immo.date),
+            address: validateText('address', immo.address),
+            livingQm: validateText('livingQm', immo.livingQm),
+            propertyQm: validateText('propertyQm', immo.propertyQm),
+            text: validateArray('text', immo.text, validateText),
+            images: validateArray('images', immo.images, validateImage),
+        }
+    } catch (error) {
+        console.error(`Immo validation failed "${(error as any).message}"\n\n${JSON.stringify(immo, null, 2)}`);
+        throw error;
     }
 }
 
-const validateArray = <T>(name: string, array: unknown, validationFn: (name: string, some: unknown) => any) => {
-    if (Array.isArray(array) &&
-        array.forEach((line, index) => validateText(`${name}[${index}]`, line)))
+const validateArray = <T>(name: string, array: any, validationFn: (name: string, some: unknown) => any) => {
+    if (Array.isArray(array)) {
+        array.forEach((some, index) => validationFn(`${name}[${index}]`, some));
         return array as T[];
+    }
     throw new ValidationError(name, 'array', array);
 }
 
-const validateImage = (image: unknown) => {
+const validateImage = (name: string, image: unkn) => {
     return {
-        url: validateText(`url`, image.url),
-        date: validateNumber(`date`, image.date),
-        hash: validateText(`hash`, image.hash),
+        url: validateText(`${name}.url`, image.url),
+        date: validateNumber(`${name}.date`, image.date),
+        hash: validateText(`${name}.hash`, image.hash),
     }
 }
 
@@ -50,15 +57,9 @@ const validateText = (name: string, text: unknown) => {
     throw new ValidationError(name, 'string', text);
 }
 
-const validateMultilineText = (name: string, text: unknown) => {
-    ret
-    if (Array.isArray(text) && text.forEach(line => validateText(name, line))) return text as string[];
-    throw new ValidationError(name, 'multiline text', text);
-}
-
 class ValidationError extends Error {
     constructor(name: string, expected: string, got: any) {
         super(`VALIDATION FAILED - ${name}: expected "${expected}" but got "${JSON.stringify(got)}".`)
     }
 }
-const isValidationError = (err: unknown): err is Error => err instanceof ValidationError;
+export const isValidationError = (err: unknown): err is Error => err instanceof ValidationError;

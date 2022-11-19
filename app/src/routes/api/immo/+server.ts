@@ -1,8 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { ImmoRepository } from '../../../lib/server/immo.repository';
-import { saveImmo } from './save';
-
-const immoRepo = await ImmoRepository.create();
+import { isValidationError, saveImmo } from './save';
 
 export const POST: RequestHandler = async ({ request }) => {
   const json = await request.json();

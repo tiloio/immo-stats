@@ -1,30 +1,36 @@
-import { test, expect, Page, Locator, ElementHandle } from '@playwright/test';
+import { test, expect, Page, Locator, ElementHandle, BrowserContext } from '@playwright/test';
 import type { ElementHandleForTag } from 'playwright-core/types/structs';
 import { imageHash } from 'image-hash';
-import { Immo } from '../../immo';
 import { transferImmos } from '../adapters/immo-api';
+import { Immo } from '../../../immo';
 
 type Article = {
   text: string,
   url: string,
-  element: ElementHandleForTag<'article'>
+  element: ElementHandleForTag<'a'>
 }
 
-test('homepage has Playwright in title and get started link linking to the intro page', async ({ page }) => {
+test('scrape articles', async ({ page, context, request }) => {
   await page.goto('https://www.ebay-kleinanzeigen.de/s-suchanfrage.html?keywords=haus&categoryId=&locationStr=Wolfsburg+-+Niedersachsen&locationId=3071&radius=20&sortingField=SORTING_DATE&adType=&posterType=&pageNum=1&action=find&maxPrice=&minPrice=800');
   await clearPageFromBanners(page);
 
   const articles = await scrapeArticles(page);
   console.log(`Read ${articles.length} articles`);
 
-  const immos = await Promise.all(articles.map(article => extractImmo(page, article)));
-  await transferImmos(immos);
+  const immos: Immo[] = [];
+  for (const article of articles.slice(0, 3)) {
+    immos.push(await extractImmo(context, article));
+  }
+  await transferImmos(request, immos);
 });
 
 
-const extractImmo = async (page: Page, article: Article): Promise<Immo> => {
-  await article.element.click();
-
+const extractImmo = async (context: BrowserContext, article: Article): Promise<Immo> => {
+  const [page] = await Promise.all([
+    context.waitForEvent('page'),
+    article.element.click({ button: "middle" })
+  ]);
+  await page.waitForLoadState('networkidle');
   console.log(`Fetch article (${page.url()})`);
 
   await page.locator('.galleryimage-element').first().waitFor({ state: 'visible' });
@@ -39,6 +45,11 @@ const extractImmo = async (page: Page, article: Article): Promise<Immo> => {
   const livingQm = await listElementText(page, "Wohnfläche");
   const propertyQm = await listElementText(page, "Grundstücksfläche");
   const text = await fetchArrayText(page.locator("#viewad-description"));
+
+  await page.close();
+
+  const pages = await context.pages();
+  await pages[0].bringToFront()
 
   return {
     scrape: {
@@ -83,7 +94,7 @@ const extractImages = (imageElements: ElementHandle[]) =>
     return { url, hash, date: Date.now() }
   }));
 
-const hashImage = (url: string) => new Promise((resolve, reject) => imageHash(url, 128, true, (error, data) => {
+const hashImage = (url: string) => new Promise((resolve, reject) => imageHash(url, 64, true, (error, data) => {
   if (error) reject(error);
   resolve(data);
 }));
@@ -93,10 +104,11 @@ const scrapeArticles = async (page: Page) => {
   const articleElements = await page.$$('article');
   const articles = await Promise.all(articleElements.map(async article => {
     const text = await article.textContent();
+    const element = await article.$('h2 a');
 
     return {
       text: text ?? '',
-      element: article,
+      element,
       url: await article.getAttribute('data-href') ?? ''
     } as Article
   }));

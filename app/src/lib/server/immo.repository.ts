@@ -1,25 +1,21 @@
-import type Surreal from "surrealdb.js";
+import Surreal from "surrealdb.js";
 import { env } from "./adapters/environment";
 import { SurrealDbAdapter } from "./adapters/surrealdb";
-import type { Immo } from "../../../../immo.ts";
+import type { Immo } from "../../../../immo";
 
 export class ImmoRepository {
-
-    private db: Surreal;
-
     private constructor() {
-        this.db = Surreal.Instance;
     }
 
     static async create() {
         const adapter = new SurrealDbAdapter({
             namespace: "immo-stats",
             database: "immos",
-            address: env("IMMO_DB_ADDRESS"),
+            address: `${env("IMMO_DB_HOST")}:${env('IMMO_DB_PORT')}/${env('IMMO_DB_PATH')}`,
             username: env("IMMO_DB_USER"),
             password: env("IMMO_DB_PW"),
         });
-        await dbAdapter.db();
+        await adapter.db();
         return new ImmoRepository();
     }
 
@@ -28,10 +24,10 @@ export class ImmoRepository {
     }
 
     async save(immo: Immo) {
-       const imageRecords = await Promise.all(immo.images.map(image => {
-            await this.db.create('image', {
+       const imageRecords = await Promise.all(immo.images.map(async image => {
+            await Surreal.Instance.create('image', {
                 scrape: {
-                    source: immo.source,
+                    source: immo.scrape.source,
                     date: new Date(image.date).toISOString(),
                     url: image.url,
                 },
@@ -39,11 +35,11 @@ export class ImmoRepository {
             });
         }));
 
-        await this.db.create('ad', {
+        await Surreal.Instance.create('ad', {
             scrape: {
-                source: immo.source,
+                source: immo.scrape.source,
                 date: new Date(immo.date).toISOString(),
-                url: immo.url,
+                url: immo.scrape.url,
             },
             title: immo.title, 
             price: immo.price, 
@@ -57,7 +53,7 @@ export class ImmoRepository {
     }
 
     async loadAll() {
-		const immos = await db.select("ad");
+		const immos = await Surreal.Instance.select("ad");
         return immos;
     }
 }

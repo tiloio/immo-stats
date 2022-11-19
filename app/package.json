@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "npm run db:start vite dev",
+		"dev": "concurrently -n db,app \"env-cmd npm run db:start\" \"vite dev\"",
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "playwright test",
@@ -11,12 +11,13 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --plugin-search-dir . --check .",
 		"format": "prettier --plugin-search-dir . --write .",
-		"db:start": "surreal start --log debug --user root --pass root memory"
+		"db:start": "surreal start --log debug --user $IMMO_DB_USER --pass $IMMO_DB_PW memory --bind 0.0.0.0:$IMMO_DB_PORT"
 	},
 	"devDependencies": {
 		"@playwright/test": "1.25.0",
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/kit": "next",
+		"concurrently": "^7.5.0",
 		"prettier": "^2.6.2",
 		"prettier-plugin-svelte": "^2.7.0",
 		"svelte": "^3.44.0",
@@ -28,6 +29,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"env-cmd": "^10.1.0",
 		"surrealdb.js": "^0.5.0"
 	}
 }

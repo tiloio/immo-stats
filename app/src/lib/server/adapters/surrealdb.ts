@@ -10,11 +10,9 @@ interface SurrealDBAccessData {
 
 export class SurrealDbAdapter {
 
-    private database: Surreal;
     private signedIn = false;
 
     constructor(private accessData: SurrealDBAccessData) {
-        this.database = new Surreal(accessData.address);
     }
 
     db = async () => {
@@ -22,11 +20,11 @@ export class SurrealDbAdapter {
             await this.setup();
             this.signedIn = true;
         }
-        return this.database;
     }
 
     private setup = async () =>{
-        await this.database.signin({ user: this.accessData.username, pass: this.accessData.password });
-        await this.database.use(this.accessData.namespace, this.accessData.database);
+        await Surreal.Instance.connect(this.accessData.address);
+        await Surreal.Instance.signin({ user: this.accessData.username, pass: this.accessData.password });
+        await Surreal.Instance.use(this.accessData.namespace, this.accessData.database);
     } 
 }

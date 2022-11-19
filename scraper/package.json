@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "playwright test",
+    "start": "IMMO_API_URL=\"http://localhost:5173/api/immo\" playwright test",
     "dev": "playwright test --headed"
   },
   "repository": {
