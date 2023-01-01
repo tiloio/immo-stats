@@ -1,5 +1,5 @@
 {
-  "name": "immo-stats",
+  "name": "immo-stats-scraper",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/tiloio/immo-stats#readme",
   "devDependencies": {
-    "@playwright/test": "1.26.0"
+    "@playwright/test": "1.29.1"
   },
   "dependencies": {
     "image-hash": "5.3.1"

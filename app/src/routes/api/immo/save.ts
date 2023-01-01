@@ -39,7 +39,7 @@ const validateArray = <T>(name: string, array: any, validationFn: (name: string,
     throw new ValidationError(name, 'array', array);
 }
 
-const validateImage = (name: string, image: unkn) => {
+const validateImage = (name: string, image: any) => {
     return {
         url: validateText(`${name}.url`, image.url),
         date: validateNumber(`${name}.date`, image.date),

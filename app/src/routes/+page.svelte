@@ -1,8 +1,8 @@
-<script>
-    import Ad from 'ad.svelte';
+<script lang="ts">
+    import Ad from './ad.svelte';
 
   /** @type {import('./$types').PageData} */
-  export let data;
+  export let data: any;
 </script>
 
 

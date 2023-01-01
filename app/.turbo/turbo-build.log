@@ -1,0 +1,35 @@
+
+> app@0.0.1 build /Users/tilo/workspace/immo-stats/app
+> vite build
+
+
+vite v4.0.3 building for production...
+transforming...
+✓ 39 modules transformed.
+15:13:10 [vite-plugin-svelte] dom compile done.
+package      	files	  time	   avg
+app          	    3	63.4ms	21.1ms
+@sveltejs/kit	    2	41.9ms	21.0ms
+rendering chunks...
+
+vite v4.0.3 building SSR bundle for production...
+transforming...
+✓ 65 modules transformed.
+15:13:10 [vite-plugin-svelte] ssr compile done.
+package      	files	  time	  avg
+app          	    3	14.9ms	5.0ms
+@sveltejs/kit	    2	 2.8ms	1.4ms
+Generated an empty chunk: "hooks".
+rendering chunks...
+.svelte-kit/output/server/vite-manifest.json                         2.03 kB
+.svelte-kit/output/server/chunks/hooks.js                            0.00 kB
+.svelte-kit/output/server/chunks/env-private.js                      0.12 kB
+.svelte-kit/output/server/entries/pages/_page.server.ts.js           0.23 kB
+.svelte-kit/output/server/entries/fallbacks/layout.svelte.js         0.24 kB
+.svelte-kit/output/server/entries/fallbacks/error.svelte.js          0.79 kB
+.svelte-kit/output/server/entries/pages/_page.svelte.js              0.84 kB
+.svelte-kit/output/server/chunks/immo.repository.js                  2.10 kB
+.svelte-kit/output/server/entries/endpoints/api/immo/_server.ts.js   2.48 kB
+.svelte-kit/output/server/chunks/index.js                            3.62 kB
+.svelte-kit/output/server/index.js                                  99.61 kB
+ ELIFECYCLE  Command failed.
